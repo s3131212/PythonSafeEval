@@ -63,7 +63,7 @@ class SafeEval:
         subprocess.run("docker image remove {session_id}_image --no-prune".format(session_id=self.__session_id).split(), check=True, stdout=subprocess.DEVNULL)
 
         # remove session directory
-        shutil.rmtree(self.__session_path) # too dangerous, put it back later
+        shutil.rmtree(self.__session_path)
 
     def eval(self, code=None, time_limit=0):
         if code is None:
