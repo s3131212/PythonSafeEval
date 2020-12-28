@@ -19,4 +19,3 @@ RUN apt-get -y update && apt-get install -y \
 COPY ./.nsjail /nsjail
 RUN cd /nsjail && make && mv /nsjail/nsjail /bin && rm -rf -- /nsjail
 {modules}
-{copy_code}
