@@ -7,10 +7,10 @@ import random
 import string
 
 class SafeEval:
-    def __init__(self, version=None, modules=None):
+    def __init__(self, version=None, modules=None, tmp_dir=None):
         self.__module_path = Path(__file__).parent
         self.__session_id = "python_safe_eval_" + self.__random_word()
-        self.__session_path = self.__module_path / Path('.jailfs') / Path(self.__session_id)
+        self.__session_path = self.__module_path / Path('.jailfs') / Path(self.__session_id) if tmp_dir is None else Path(tmp_dir) / Path(self.__session_id)
         self.__container_has_started = False
         
         # check permission
@@ -67,12 +67,15 @@ class SafeEval:
 
     def __del__(self):
         if self.__container_has_started:
-            # stop and remove docker container
-            subprocess.run("docker stop {session_id}".format(session_id=self.__session_id).split(), check=True, stdout=subprocess.DEVNULL)
-            subprocess.run("docker rm {session_id}".format(session_id=self.__session_id).split(), check=True, stdout=subprocess.DEVNULL)
+            try:
+                # stop and remove docker container
+                subprocess.run("docker stop {session_id}".format(session_id=self.__session_id).split(), check=True, stdout=subprocess.DEVNULL)
+                subprocess.run("docker rm {session_id}".format(session_id=self.__session_id).split(), check=True, stdout=subprocess.DEVNULL)
 
-            # remove image 
-            subprocess.run("docker image remove {session_id}_image --no-prune".format(session_id=self.__session_id), shell=True, check=True, stdout=subprocess.DEVNULL)
+                # remove image 
+                subprocess.run("docker image remove {session_id}_image --no-prune".format(session_id=self.__session_id), shell=True, check=True, stdout=subprocess.DEVNULL)
+            except:
+                pass
 
         try:
             # remove session directory
