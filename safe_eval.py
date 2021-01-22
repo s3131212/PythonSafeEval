@@ -52,9 +52,7 @@ class SafeEval:
             f.write(Dockerfile)
 
         # build docker image
-        tempdir = os.getcwd()
-        os.chdir(self.__session_path)
-        result = subprocess.run("docker build --network=host -t {session_id}_image .".format(session_id=self.__session_id), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        result = subprocess.run("docker build --network=host -t {session_id}_image .".format(session_id=self.__session_id), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, cwd=self.__session_path)
         if result.returncode != 0:
             raise RuntimeError("Failed to build docker images: " + result.stderr.decode("utf-8"))
 
@@ -101,7 +99,7 @@ class SafeEval:
         
         # save file to the volume
         volume_filename = self.__random_word() + ".py"
-        shutil.copyfile(Path(__file__).parent /  filename, self.__session_path / volume_filename)
+        shutil.copyfile(filename, self.__session_path / volume_filename)
 
         # execute code
         return self.__execute_file_in_volume(volume_filename, time_limit)
