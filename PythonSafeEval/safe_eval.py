@@ -57,7 +57,7 @@ class SafeEval:
             raise RuntimeError("Failed to build docker images: " + result.stderr.decode("utf-8"))
 
         # run docker image
-        result = subprocess.run("""docker run --privileged --name={session_id} -v "{session_path}:/volume" -d -it {session_id}_image""".format(session_id=self.__session_id, session_path=self.__session_path), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        result = subprocess.run("""docker run --rm --privileged --name={session_id} -v "{session_path}:/volume" -d -it {session_id}_image""".format(session_id=self.__session_id, session_path=self.__session_path), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         if result.returncode != 0:
             raise RuntimeError("Failed to start docker container: " + result.stderr.decode("utf-8"))
 
@@ -68,7 +68,6 @@ class SafeEval:
             try:
                 # stop and remove docker container
                 subprocess.run("docker stop {session_id}".format(session_id=self.__session_id).split(), check=True, stdout=subprocess.DEVNULL)
-                subprocess.run("docker rm {session_id}".format(session_id=self.__session_id).split(), check=True, stdout=subprocess.DEVNULL)
 
                 # remove image 
                 subprocess.run("docker image remove {session_id}_image --no-prune".format(session_id=self.__session_id), shell=True, check=True, stdout=subprocess.DEVNULL)
